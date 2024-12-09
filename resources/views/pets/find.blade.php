@@ -1,13 +1,14 @@
 @extends('base')
 
 @section('content')
-    <div>Find pet by ID</div>
+<div class="m-2">
+    <div class='text-xl'>Find pet by ID</div>
     <form action="{{ route('pets.find') }}" method="GET">
         <div>
             <label for="text-input">Pet ID</label>
             <input type="number" name="petId" id="petId" placeholder="Enter pet ID" value="{{ request('pet_id') }}" required>
         </div>
-        <button type="submit">Submit</button>
+        <button type="submit" class="px-2 my-2 bg-slate-200">Submit</button>
     </form>
     <hr />
     @if ($pet)
@@ -61,4 +62,5 @@
             Pet with given ID not found
         </div>
     @endif
+</div>
 @endsection

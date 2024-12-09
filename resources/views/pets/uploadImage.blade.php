@@ -1,8 +1,8 @@
 @extends('base')
 
 @section('content')
-<div>
-    <div>Upload image to pet</div>
+<div class="m-2">
+    <div class='text-xl'>Upload image to pet</div>
     <form action="{{ route('pets.storeImage') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div>
@@ -16,7 +16,7 @@
         <div>
             <input type="file" id="myFile" name="file">
         </div>
-        <button type="submit">Submit</button>
+        <button type="submit" class="px-2 my-2 bg-slate-200">Submit</button>
     </form>
 </div>
 @endsection

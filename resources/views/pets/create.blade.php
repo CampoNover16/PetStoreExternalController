@@ -1,12 +1,13 @@
 @extends('base')
 
 @section('content')
-    <div>Add pet</div>
+<div class="m-2">
+    <div class='text-xl'>Add pet</div>
     <form action="{{ route('pets.store') }}" method="POST">
         @csrf
         <div>
             <label for="text-input">Pet name</label>
-            <input type="text" id="name" name="text" placeholder="Enter pet name" required>
+            <input type="text" id="name" name="name" placeholder="Enter pet name" required>
         </div>
         <div>
             <label for="text-input">Photo Url</label>
@@ -39,6 +40,7 @@
                 <option value="sold">Sold</option>
             </select>
         </div>
-        <button type="submit">Submit</button>
+        <button type="submit" class="px-2 my-2 bg-slate-200">Submit</button>
     </form>
+</div>
 @endsection

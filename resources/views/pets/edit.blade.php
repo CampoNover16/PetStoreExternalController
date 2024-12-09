@@ -1,6 +1,7 @@
 @extends('base')
 
 @section('content')
+<div class="m-2">
     <div class='text-xl'>Edit pet</div>
     <form action="{{ route('pets.update', $pet['id']) }}" method="POST">
         @csrf
@@ -42,4 +43,5 @@
         </div>
         <button type="submit" class="px-2 my-2 bg-slate-200">Submit</button>
     </form>
+</div>
 @endsection

@@ -9,17 +9,12 @@ class PetController extends Controller
 {
     public function index()
     {
-        $response = Http::withOptions(['verify' => false])->get("https://petstore.swagger.io/v2/pet/findByStatus?status=available");
-
-        if ($response->successful()) {
-            $pets = $response->json();
-        }
-        return view('index', compact('pets'));
+        return view('pets.index');
     }
 
     public function create()
     {
-        return view('create');
+        return view('pets.create');
     }
 
     public function store(Request $request)
@@ -40,7 +35,47 @@ class PetController extends Controller
 
         $response = Http::withOptions(['verify' => false])->accept('application/json')->post("https://petstore.swagger.io/v2/pet", $formData);
 
-        return redirect()->route('index');
+        return redirect()->route('pets.index');
+    }
+
+    public function find(Request $request)
+    {
+        $pet = null;
+
+        if ($request->has('petId')) {
+            $petId = $request->input('petId');
+            $response = Http::withOptions(['verify' => false])->get("https://petstore.swagger.io/v2/pet/{$petId}");
+
+            if ($response->successful()) {
+                $pet = $response->json();
+            }
+        }
+        return view('pets.find', compact('pet'));
+    }
+
+    public function findByStatus(Request $request)
+    {
+        $pets = null;
+
+        if ($request->has('status')) {
+            $request->validate([
+                'status' => 'required',
+            ]);
+            $petsStatus = $request->input('status');
+            $query = http_build_query(['status' => $petsStatus]);
+            $queryParts = [];
+            foreach ($petsStatus as $status) {
+                $queryParts[] = 'status=' . urlencode($status);
+            }
+            $query = implode('&', $queryParts);
+
+            $response = Http::withOptions(['verify' => false])->accept('application/json')->get("https://petstore.swagger.io/v2/pet/findByStatus?" . $query);
+            if ($response->successful()) {
+                $pets = $response->json();
+            }
+        }
+
+        return view('pets.findByStatus', compact('pets'));
     }
 
     public function edit($id)
@@ -49,9 +84,9 @@ class PetController extends Controller
 
         if ($response->successful()) {
             $pet = $response->json();
-            return view('edit', compact('pet'));
+            return view('pets.edit', compact('pet'));
         } else {
-            return redirect()->route('index');
+            return redirect()->route('pets.index');
         }
     }
 
@@ -74,7 +109,59 @@ class PetController extends Controller
         $response = Http::withOptions(['verify' => false])->accept('application/json')->put("https://petstore.swagger.io/v2/pet", $formData);
 
         if ($response->successful()) {
-            return redirect()->route('index');
+            return redirect()->route('pets.index');
+        }
+    }
+
+    public function partialEdit()
+    {
+        return view('pets.partialEdit');
+    }
+
+    public function partialUpdate(Request $request)
+    {
+        if($request->has('name')){
+            $request->validate([
+                'petID' => 'required|integer',
+                'photourl' => 'required',
+                'name' => 'required',
+            ]);
+
+            $petId = $request->input('petId');
+            $formData = [
+                'petID' => $request->input('petId'),
+                'name' => $request->input('name'),
+                'status' => $request->input('status')
+            ];
+
+            $response = Http::asForm()->withOptions(['verify' => false])->accept('application/json')->post("https://petstore.swagger.io/v2/pet/{$petId}", $formData);
+
+            return redirect()->route('pets.index');
+        }
+    }
+
+    public function uploadImage()
+    {
+        return view('pets.uploadImage');
+    }
+
+    public function storeImage(Request $request)
+    {
+        if($request->has('petId')){
+            $request->validate([
+                'petID' => 'required|integer',
+                'additionalMetadata' => 'string',
+                'file' => 'required',
+            ]);
+            $file = $request->file('file');
+            $petId = $request->input('petId');
+            $formData = [
+                'additionalMetadata' => $request->input('additionalMetadata'),
+            ];
+
+            $response = Http::attach('file', file_get_contents($file), $file->getClientOriginalName())->withOptions(['verify' => false])->accept('application/json')->post("https://petstore.swagger.io/v2/pet/{$petId}/uploadImage", $formData);
+
+            return redirect()->route('pets.index');
         }
     }
 
@@ -83,8 +170,8 @@ class PetController extends Controller
         $response = Http::withOptions(['verify' => false])->delete("https://petstore.swagger.io/v2/pet/{$id}");
 
         if (!$response->ok()) {
-            return redirect()->route('index');
+            return redirect()->route('pets.index');
         }
-        return redirect()->route('index');
+        return redirect()->route('pets.index');
     }
 }
